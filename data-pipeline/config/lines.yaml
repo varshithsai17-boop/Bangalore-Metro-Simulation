@@ -1,0 +1,48 @@
+# Namma Metro dashboard — pipeline configuration.
+# Scope: Green + Purple lines. Geometry/stations are derived from OSM (never hardcoded);
+# only display theming and the schedule model (no machine feed exists) live here.
+
+network:
+  name: Namma Metro
+  city: Bengaluru
+  # Matched against the OSM relation `network` tag (case-insensitive regex).
+  overpass_network_regex: "Namma"
+
+# Lines to include. `ref` matches the OSM route-relation `ref` tag. The canonical
+# (max-stop) relation per ref is selected automatically, so partial/legacy relations
+# are ignored. `colour` is tuned for contrast on the dark UI; `osm_colour` keeps the
+# authoritative OSM value for reference.
+lines:
+  - id: purple
+    ref: Purple
+    name: Purple Line
+    colour: "#b14fe0"
+    osm_colour: "#e542de"
+  - id: green
+    ref: Green
+    name: Green Line
+    colour: "#19c37d"
+    osm_colour: "#009933"
+
+# Schedule model. Namma Metro has no public real-time feed, so train motion is derived
+# deterministically from these published-frequency parameters + geometry.
+schedule:
+  # Per-segment travel times are derived from inter-station distance using this effective
+  # scheduled speed, plus a fixed dwell per stop — no timetable is hardcoded.
+  scheduleSpeedKmph: 40
+  dwellSec: 25
+
+  # Operating hours in minutes since midnight, by day type.
+  operatingHours:
+    weekday:  { start: 300, end: 1380 }   # 05:00 - 23:00
+    saturday: { start: 300, end: 1380 }   # 05:00 - 23:00
+    sunday:   { start: 420, end: 1380 }   # 07:00 - 23:00
+
+  # Headway (per direction) by minute-of-day window. Approximates BMRCL published
+  # frequencies: ~5 min peak, ~8 min midday, ~10-12 min early/late.
+  headways:
+    - { from: 300,  to: 420,  sec: 600 }   # 05:00-07:00  early    10 min
+    - { from: 420,  to: 660,  sec: 300 }   # 07:00-11:00  AM peak   5 min
+    - { from: 660,  to: 1020, sec: 480 }   # 11:00-17:00  midday    8 min
+    - { from: 1020, to: 1260, sec: 300 }   # 17:00-21:00  PM peak   5 min
+    - { from: 1260, to: 1380, sec: 720 }   # 21:00-23:00  late     12 min

@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+data-pipeline/cache/
+
+# Node / Vite
+node_modules/
+web/dist/
+*.local
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
